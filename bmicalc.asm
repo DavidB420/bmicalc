@@ -24,8 +24,8 @@ heightInchesStr db 'Height in inches',0
 weightPoundsStr db 'Weight in pounds',0
 bmiCalcStr db 'Calculate BMI',0
 currentSelection db 0
-heightNumX dw 0
-weightNumY dw 0
+heightNumX dw 210
+weightNumX dw 210
 
 drawFirstScreen:
 mov esi,heightInchesStr
@@ -103,6 +103,7 @@ cmp word [mouseY],194
 jle s3
 cmp word [mouseY],220
 jg s3
+call getweight
 s3:
 jmp mainLoop
 
@@ -118,62 +119,91 @@ jmp sys_windowloop
 donegetheight:
 ret
 
+getweight:
+cmp byte [currentSelection],2
+je donegetweight
+mov byte [currentSelection],2
+getWeightLoop:
+mov dword [mouseaddress],lbuttonclick
+mov dword [keybaddress],keybinput
+mov dword [bgtaskaddress],sys_nobgtasks
+jmp sys_windowloop
+donegetweight:
+ret
+
 keybinput:
 cmp al,'1'
 jne key1
-mov al,'1'
+mov dl,'1'
 call addnumber
 jmp getheightLoop
 key1:
 cmp al,'2'
 jne key2
-mov al,'2'
+mov dl,'2'
 call addnumber
 jmp getheightLoop
 key2:
 cmp al,'3'
 jne key3
-mov al,'3'
+mov dl,'3'
 call addnumber
 jmp getheightLoop
 key3:
 cmp al,'4'
 jne key4
-mov al,'4'
+mov dl,'4'
 call addnumber
 jmp getheightLoop
 key4:
 cmp al,'5'
 jne key5
-mov al,'5'
+mov dl,'5'
 call addnumber
 jmp getheightLoop
 key5:
 cmp al,'6'
 jne key6
-mov al,'6'
+mov dl,'6'
 call addnumber
 jmp getheightLoop
 key6:
 cmp al,'7'
 jne key7
-mov al,'7'
+mov dl,'7'
 call addnumber
 jmp getheightLoop
 key7:
 cmp al,'8'
 jne key8
-mov al,'8'
+mov dl,'8'
 call addnumber
 jmp getheightLoop
 key8:
 cmp al,'9'
 jne key9
-mov al,'9'
+mov dl,'9'
 call addnumber
 jmp getheightLoop
 key9:
 ret
 
 addnumber:
+pusha
+cmp byte [currentSelection],1
+jne skipheightAdd
+mov bx,word [heightNumX]
+mov cx,100
+jmp skipweightAdd
+skipheightAdd:
+mov bx,word [weightNumX]
+mov cx,200
+skipweightAdd:
+mov word [Color],0
+mov word [X],bx
+mov word [Y],cx
+call sys_printChar
+add bx,5
+mov word [heightNumX],bx
+popa
 ret
